@@ -77,9 +77,27 @@
     }
   }
 
-  /* ========== 详情浮层 ========== */
-  var mask = document.getElementById('modalMask');
-  var body = document.getElementById('modalBody');
+  /* ========== 详情浮层（动态创建/销毁 DOM） ========== */
+  var currentModal = null;
+
+  function ensureModal() {
+    if (currentModal) return currentModal;
+    var mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.innerHTML =
+      '<div class="modal-sheet" role="dialog" aria-modal="true">' +
+        '<div class="modal-handle"></div>' +
+        '<button class="modal-close" aria-label="关闭">\u2715</button>' +
+        '<div class="modal-body"></div>' +
+      '</div>';
+    document.body.appendChild(mask);
+    mask.addEventListener('click', function (e) {
+      if (e.target === mask) closeDetail();
+    });
+    mask.querySelector('.modal-close').addEventListener('click', closeDetail);
+    currentModal = mask;
+    return mask;
+  }
 
   function openDetail(item) {
     var points = (item.points && item.points.length)
@@ -103,24 +121,35 @@
     if (item.seriesName) meta += '<span class="tag tag-mint">\u29C9 ' + esc(item.seriesName) + '</span>';
     meta += badgeHTML(item);
 
-    body.innerHTML =
+    var mask = ensureModal();
+    mask.querySelector('.modal-body').innerHTML =
       '<h3 class="m-title">' + esc(item.title) + '</h3>' +
       '<div class="m-meta">' + meta + '</div>' +
       (item.summary ? '<p class="m-summary">' + esc(item.summary) + '</p>' : '') +
       points + links;
-    mask.classList.add('show');
+
+    // 先确保 DOM 已渲染，下一帧再添加 .show 触发动画
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        mask.classList.add('show');
+      });
+    });
     document.body.style.overflow = 'hidden';
   }
 
   function closeDetail() {
-    mask.classList.remove('show');
+    if (!currentModal) return;
+    var m = currentModal;
+    currentModal = null;
+    m.classList.remove('show');
+    // 等待淡出动画结束后从 DOM 中彻底移除
+    setTimeout(function () {
+      if (m && m.parentNode) {
+        m.parentNode.removeChild(m);
+      }
+    }, 300);
     document.body.style.overflow = '';
   }
-
-  mask.addEventListener('click', function (e) {
-    if (e.target === mask) closeDetail();
-  });
-  document.getElementById('modalClose').addEventListener('click', closeDetail);
 
   /* ========== 卡片点击 ========== */
   document.querySelector('.app-main').addEventListener('click', function (e) {

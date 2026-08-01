@@ -1,5 +1,5 @@
 // 自律小窝 PWA 服务工作线程：预缓存资源，离线可用，版本化更新
-const CACHE_VERSION = 'zili-xiaowo-v4';
+const CACHE_VERSION = 'zili-xiaowo-v5';
 const ASSETS = [
   './',
   './index.html',
