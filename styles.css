@@ -220,6 +220,10 @@ body {
   background: rgba(107, 93, 84, 0.3);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+  display: none;
+}
+.sidebar-overlay.show {
+  display: block;
   animation: fadeIn 0.25s both;
 }
 
@@ -368,7 +372,11 @@ body {
   position: fixed; inset: 0; z-index: 50;
   background: rgba(107, 93, 84, 0.32);
   backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-  display: flex; align-items: flex-end; justify-content: center;
+  align-items: flex-end; justify-content: center;
+  display: none;
+}
+.modal-mask.show {
+  display: flex;
   animation: fadeIn 0.25s both;
 }
 .modal-sheet {

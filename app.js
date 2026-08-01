@@ -108,12 +108,12 @@
       '<div class="m-meta">' + meta + '</div>' +
       (item.summary ? '<p class="m-summary">' + esc(item.summary) + '</p>' : '') +
       points + links;
-    mask.hidden = false;
+    mask.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
 
   function closeDetail() {
-    mask.hidden = true;
+    mask.classList.remove('show');
     document.body.style.overflow = '';
   }
 
@@ -151,7 +151,7 @@
     if (isMobile.matches) {
       // 移动端：展开/收起覆盖式抽屉
       var expanded = sidebar.classList.toggle('expanded');
-      overlay.hidden = !expanded;
+      overlay.classList.toggle('show', expanded);
     } else {
       // 桌面端：折叠/展开
       var collapsed = sidebar.classList.toggle('collapsed');
@@ -161,7 +161,7 @@
 
   overlay.addEventListener('click', function () {
     sidebar.classList.remove('expanded');
-    overlay.hidden = true;
+    overlay.classList.remove('show');
   });
 
   /* ========== 板块切换 ========== */
@@ -189,7 +189,7 @@
     // 移动端切换后收起侧边栏
     if (isMobile.matches) {
       sidebar.classList.remove('expanded');
-      overlay.hidden = true;
+      overlay.classList.remove('show');
     }
     // 滚动到顶部
     document.querySelector('.main-area').scrollTo({ top: 0, behavior: 'smooth' });

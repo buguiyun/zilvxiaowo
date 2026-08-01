@@ -1,5 +1,5 @@
 // 自律小窝 PWA 服务工作线程：预缓存资源，离线可用，版本化更新
-const CACHE_VERSION = 'zili-xiaowo-v3';
+const CACHE_VERSION = 'zili-xiaowo-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,16 @@ const ASSETS = [
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png'
+];
+
+// 核心文件：network-first，确保在线时用户总是拿到最新代码
+const CORE_FILES = [
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './data.js',
+  './manifest.webmanifest'
 ];
 
 self.addEventListener('install', (event) => {
@@ -27,17 +37,41 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const network = fetch(event.request).then((res) => {
-        // 仅缓存同源静态资源
-        if (res && res.status === 200 && new URL(event.request.url).origin === self.location.origin) {
-          const clone = res.clone();
-          caches.open(CACHE_VERSION).then((c) => c.put(event.request, clone));
+
+  const url = new URL(event.request.url);
+  // 仅处理同源请求
+  if (url.origin !== self.location.origin) return;
+
+  const isCore = CORE_FILES.some(function (f) {
+    return url.pathname.endsWith(f) || url.pathname === f.replace('./', '/');
+  });
+
+  if (isCore) {
+    // 核心文件：network-first
+    event.respondWith(
+      fetch(event.request).then(function (res) {
+        if (res && res.status === 200) {
+          var clone = res.clone();
+          caches.open(CACHE_VERSION).then(function (c) { c.put(event.request, clone); });
         }
         return res;
-      }).catch(() => cached);
-      return cached || network;
-    })
-  );
+      }).catch(function () {
+        return caches.match(event.request);
+      })
+    );
+  } else {
+    // 非核心文件：stale-while-revalidate
+    event.respondWith(
+      caches.match(event.request).then(function (cached) {
+        var network = fetch(event.request).then(function (res) {
+          if (res && res.status === 200) {
+            var clone = res.clone();
+            caches.open(CACHE_VERSION).then(function (c) { c.put(event.request, clone); });
+          }
+          return res;
+        }).catch(function () { return cached; });
+        return cached || network;
+      })
+    );
+  }
 });
