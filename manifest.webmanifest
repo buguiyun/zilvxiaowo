@@ -6,7 +6,7 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#FFF8F2",
   "theme_color": "#FFF8F2",
   "categories": ["productivity", "education", "lifestyle"],
