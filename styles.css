@@ -29,6 +29,9 @@
   --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
 }
 
+/* ========== 全局规则：强制 hidden 属性生效 ========== */
+[hidden] { display: none !important; }
+
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 html, body { margin: 0; padding: 0; height: 100%; }
