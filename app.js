@@ -86,8 +86,10 @@
     mask.className = 'modal-mask';
     mask.innerHTML =
       '<div class="modal-sheet" role="dialog" aria-modal="true">' +
-        '<div class="modal-handle"></div>' +
-        '<button class="modal-close" aria-label="关闭">\u2715</button>' +
+        '<div class="modal-header">' +
+          '<div class="modal-handle" title="点击关闭"></div>' +
+          '<button class="modal-close" aria-label="关闭">\u2715</button>' +
+        '</div>' +
         '<div class="modal-body"></div>' +
       '</div>';
     document.body.appendChild(mask);
@@ -95,6 +97,7 @@
       if (e.target === mask) closeDetail();
     });
     mask.querySelector('.modal-close').addEventListener('click', closeDetail);
+    mask.querySelector('.modal-handle').addEventListener('click', closeDetail);
     currentModal = mask;
     return mask;
   }
@@ -239,7 +242,7 @@
   // 注册 Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
+      navigator.serviceWorker.register('sw.js?v=6').catch(function () {});
     });
   }
 })();
